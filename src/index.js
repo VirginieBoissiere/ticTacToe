@@ -2,27 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-class Square extends React.Component {
-//NOTE Les composants React peuvent définir un état local en définissant this.state dans leurs constructeurs. this.state est considéré comme une donnée privée du composant React qui le définit. Stockons donc la valeur courante du Square dans this.state, et changeons-la quand on clique sur la case. 
-//NOTE En appelant this.setState depuis un gestionnaire onClick dans la méthode render de Square, nous demandons à React de ré-afficher ce Square dès que le <button> est cliqué. Après la mise à jour, la this.state.value du Square sera 'X', et nous verrons donc X sur le plateau de jeu. Si vous cliquez sur n’importe quel carré, un X devrait s’y afficher.
-// constructor(props) {
-//     super(props);
-//     this.state = {
-//       value: null,
-//     };
-//   }
 
-  render() {
-    return (
-      <button
-        className="square"
-        //Quand on clique sur un Square, la fonction onClick fournie par le Board est appelée.
-        onClick={() => this.props.onClick()}
-      >
-        {this.props.value}
-      </button>
-    );
-  }
+//  on remplace la class Square par une fonction composant plus simple d'écriture
+function Square(props){
+  return (
+    <button className='square'onClick={props.onClick}>
+    {props.value}
+    </button>
+  )
 }
 
 class Board extends React.Component {
@@ -36,6 +23,7 @@ class Board extends React.Component {
   }
   // on definie le handle click de la fonction onClick du square 
   handleClick(i){
+    // on utilise slice pour créer une copie du tableau squares a modifier au lieu de travailler sur le tableau initial
     const squares =this.state.squares.slice();
     squares[i] = 'x';
     this.setState({squares:squares});
