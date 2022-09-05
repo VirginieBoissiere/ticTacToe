@@ -81,7 +81,20 @@ class Game extends React.Component {
     const history = this.state.history;
     const current = history[history.length - 1];
     const winner = calculateWinner(current.squares);
+    // je controle l'hystorique 
+    console.log(current);
 
+    //En utilisant la méthode map, on peut transformer notre historique de tours en éléments React représentant des boutons à l’écran, et afficher cette liste de boutons pour « revenir » à des tours passés.
+    const moves =history.map((step,move)=>{
+      const desc=move ?
+      'revenir au tou n°'+move:
+      'revenir au debut de la partie';
+      return(
+        <li>
+          <button onclick ={()=> this.jumpTo(move)}>{desc}</button>
+        </li>
+      )
+    })
     let status;
     if (winner) {
       status = 'Winner: ' + winner;
@@ -99,7 +112,7 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{/* TODO */}</ol>
+          <ol>{moves}</ol>
         </div>
       </div>
     );
