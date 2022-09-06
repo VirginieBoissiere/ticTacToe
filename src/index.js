@@ -13,9 +13,6 @@ function Square(props){
 }
 
 class Board extends React.Component {
- 
-  
-
   renderSquare(i) {
     // on modifie la méthode pour qu'elle lise l'information du state
      return <Square 
@@ -57,12 +54,15 @@ class Game extends React.Component {
       history: [{
         squares: Array(9).fill(null)
       }],
+      // pour partir du movement 0
+      stepNumber:0,
       xIsNext: true
     };
   }
 
   handleClick(i) {
-    const history = this.state.history;
+    // modification pour certains que pour les retour dans le passé on parte du tour selectionné
+    const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
     if (calculateWinner(squares) || squares[i]) {
@@ -73,33 +73,44 @@ class Game extends React.Component {
       history: history.concat([{
         squares: squares
       }]),
+      //  on est sûrs de ne pas rester bloqués sur le tour affiché après avoir choisi une case.
+      stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
     });
+  }
+  //  on définis la méthode jumpTo dans Game pour qu’elle mette à jour stepNumber. on définis aussi xIsNext à true si le numéro de tour que l'on utilise dans stepNumber est pair :
+  jumpTo(step){
+    this.setState({
+      stepNumber: step,
+      xIsNext: (step % 2)=== 0,
+    })
   }
   
   render() {
     const history = this.state.history;
-    const current = history[history.length - 1];
+    // on modifie la méthode render du composant Game pour qu’elle n’affiche plus systématiquement le dernier coup, mais plutôt le tour indiqué par stepNumber :
+    const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
     // je controle l'hystorique 
-    console.log(current);
+    // console.log(current);
 
     //En utilisant la méthode map, on peut transformer notre historique de tours en éléments React représentant des boutons à l’écran, et afficher cette liste de boutons pour « revenir » à des tours passés.
-    const moves =history.map((step,move)=>{
-      const desc=move ?
-      'revenir au tou n°'+move:
-      'revenir au debut de la partie';
-      return(
-        <li>
-          <button onclick ={()=> this.jumpTo(move)}>{desc}</button>
+    const moves = history.map((step, move) => {
+      const desc = move ?
+        'Go to move #' + move :
+        'Go to game start';
+      return (
+        <li key={move}>
+          <button onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>
-      )
-    })
+      );
+    });
+
     let status;
     if (winner) {
-      status = 'Winner: ' + winner;
+      status = "Winner: " + winner;
     } else {
-      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+      status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
 
     return (
@@ -107,7 +118,7 @@ class Game extends React.Component {
         <div className="game-board">
           <Board
             squares={current.squares}
-            onClick={(i) => this.handleClick(i)}
+            onClick={i => this.handleClick(i)}
           />
         </div>
         <div className="game-info">
@@ -118,7 +129,10 @@ class Game extends React.Component {
     );
   }
 }
+// ========================================
 
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<Game />);
 
 function calculateWinner(squares) {
   const lines = [
@@ -139,7 +153,4 @@ function calculateWinner(squares) {
   }
   return null;
 }
-// ========================================
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<Game />);
